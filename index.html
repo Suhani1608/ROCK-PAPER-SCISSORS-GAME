@@ -3,40 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STONE PAPER GAME</title>
-    <Link rel = "stylesheet" href = "sps.css">
+    <title>ROCK PAPER SCISSORS // CORONA ROYAL DUEL</title>
+    <!-- Google Fonts matching Suhani's Rapunzel Portfolio -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="sps.css">
 </head>
 <body>
-    <h1> ROCK PAPER SCISSORS GAME</h1>
-    <div class ="choices">
-        <div class = "choice" id = "paper">
-          <img src ="image/paper.jpg" alt="paper"></div>
-        <div class = "choice" id ="rock">
-             <img src ="image/rock.jpg" alt="rock">
-             </div>
-        <div class = "choice" id = "scissor">
-                 <img src ="image/scissor.jpg" alt="scissor">
-         </div>
+
+    <!-- Floating Sky Lanterns Background Canvas -->
+    <canvas id="lantern-canvas"></canvas>
+    <div class="sundrop-vignette"></div>
+
+    <!-- Royal Duel Match Over Modal -->
+    <div class="modal-overlay hide" id="match-modal">
+        <div class="modal-card">
+            <span class="modal-stamp" id="modal-stamp">✨ ROYAL FESTIVAL DECREE</span>
+            <h2 id="modal-title">DUEL CONCLUDED</h2>
+            <p id="modal-sub">The lanterns have spoken.</p>
+            <button id="next-bout-btn" class="btn primary"><i class="fas fa-wand-magic-sparkles"></i> Start Next Duel [SPACE]</button>
+        </div>
     </div>
 
-<div class ="score-board">
-    <div class ="score">
-        <p id ="user-score">0</p>
-        <p>User</p>
-    </div>
-    <div class = "score">
-        <p id ="computer-score">0</p>
-        <p>Computer</p>
-    </div>
-</div>
-<div class ="msg-container">
-    <p id = "msg">Play your game</p>
-</div>
-    <script src = "sps.js"></script>
+    <main class="royal-wrapper">
+        <!-- Top System Header & Chime Audio Toggle -->
+        <header class="royal-header">
+            <div class="royal-top-bar">
+                <span class="sys-tag">✨ KINGDOM OF CORONA // MARKOV AI DUEL #02</span>
+                <button id="sound-toggle" class="sound-btn" aria-label="Toggle Chimes">
+                    <i class="fas fa-music" id="sound-icon"></i>
+                    <span id="sound-label">CHIMES: ON</span>
+                </button>
+            </div>
+            <h1>ROCK PAPER SCISSORS</h1>
+
+            <!-- Royal Control Matrix: AI Engine & Weapon Loadout -->
+            <div class="config-matrix">
+                <div class="mode-selector">
+                    <button id="ai-markov" class="mode-btn active" title="Pattern-Learning Markov Chain Oracle AI">
+                        <i class="fas fa-crown"></i> ORACLE AI (LEARNS YOU)
+                    </button>
+                    <button id="ai-random" class="mode-btn" title="Playful Pascal Random RNG">
+                        <i class="fas fa-frog"></i> PASCAL RNG
+                    </button>
+                </div>
+
+                <div class="mode-selector">
+                    <button id="mode-classic" class="mode-btn active" title="Standard 3 Choices: Rock, Paper, Scissor">
+                        CLASSIC (3)
+                    </button>
+                    <button id="mode-royal5" class="mode-btn" title="5-Choice Tangled Graph: Adds Frying Pan & Crown">
+                        <i class="fas fa-sun"></i> ROYAL-5
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Live Scoreboard, Sundrop Light Bars (HP) & Streak HUD -->
+        <section class="score-board">
+            <div class="score-card player-card" id="user-card">
+                <div class="card-top-row">
+                    <span class="score-label">PRINCESS (YOU)</span>
+                    <span class="hp-text" id="user-hp-text">100% LIGHT</span>
+                </div>
+                <div class="hp-track">
+                    <div class="hp-fill user-hp" id="user-hp-bar" style="width: 100%;"></div>
+                </div>
+                <p id="user-score" class="score-num">0</p>
+            </div>
+
+            <div class="center-telemetry">
+                <div class="streak-box">
+                    <span class="telemetry-label">STREAK // BEST: <strong id="best-streak">0</strong></span>
+                    <span id="streak-count" class="streak-num">0 <i class="fas fa-sparkles"></i></span>
+                </div>
+                <div class="draws-readout">
+                    TIES: <strong id="draw-score">0</strong>
+                </div>
+            </div>
+
+            <div class="score-card ai-card" id="ai-card">
+                <div class="card-top-row">
+                    <span class="score-label" id="ai-label">ORACLE AI</span>
+                    <span class="hp-text" id="ai-hp-text">100% LIGHT</span>
+                </div>
+                <div class="hp-track">
+                    <div class="hp-fill ai-hp" id="ai-hp-bar" style="width: 100%;"></div>
+                </div>
+                <p id="computer-score" class="score-num">0</p>
+            </div>
+        </section>
+
+        <!-- Live Markov Chain Probability Divination Bar -->
+        <section class="markov-telemetry" id="markov-panel">
+            <div class="markov-header">
+                <span><i class="fas fa-eye"></i> ORACLE NEXT-MOVE PREDICTION MATRIX</span>
+                <span id="ai-readout-tag">READING STARLIGHT PATTERNS...</span>
+            </div>
+            <div class="prob-bar" id="prob-bar">
+                <div class="prob-seg seg-rock" style="width: 33.3%;">ROCK 33%</div>
+                <div class="prob-seg seg-paper" style="width: 33.3%;">PAPER 33%</div>
+                <div class="prob-seg seg-scissor" style="width: 33.4%;">SCISSOR 33%</div>
+            </div>
+        </section>
+
+        <!-- Head-to-Head Royal Clash Arena -->
+        <section class="clash-arena">
+            <div class="fighter-slot" id="user-slot">
+                <span class="slot-tag">YOUR CHOICE</span>
+                <div class="slot-icon" id="user-picked-icon">
+                    <i class="fas fa-sun"></i>
+                </div>
+                <span class="slot-name" id="user-picked-name">AWAITING</span>
+            </div>
+
+            <div class="vs-divider">
+                <span id="dmg-badge" class="dmg-badge">VS</span>
+            </div>
+
+            <div class="fighter-slot" id="ai-slot">
+                <span class="slot-tag">ORACLE COUNTER</span>
+                <div class="slot-icon" id="ai-picked-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <span class="slot-name" id="ai-picked-name">AWAITING</span>
+            </div>
+        </section>
+
+        <!-- Royal Choices (Preserves image/paper.jpg, image/rock.jpg, image/scissor.jpg + Vector Fallbacks) -->
+        <section class="choices" id="choices-grid">
+            <div class="choice" id="paper" title="Wraps Rock & Covers Crown [Key: P]">
+                <div class="choice-frame">
+                    <img src="image/paper.jpg" alt="paper" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-icon" style="display:none;"><i class="fas fa-scroll"></i></div>
+                </div>
+                <span class="weapon-name">PAPER</span>
+                <span class="key-hint">[P]</span>
+            </div>
+
+            <div class="choice" id="rock" title="Crushes Scissor & Dents Frying Pan [Key: R]">
+                <div class="choice-frame">
+                    <img src="image/rock.jpg" alt="rock" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-icon" style="display:none;"><i class="fas fa-gem"></i></div>
+                </div>
+                <span class="weapon-name">ROCK</span>
+                <span class="key-hint">[R]</span>
+            </div>
+
+            <div class="choice" id="scissor" title="Cuts Paper & Snips Crown Ribbon [Key: S]">
+                <div class="choice-frame">
+                    <img src="image/scissor.jpg" alt="scissor" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-icon" style="display:none;"><i class="fas fa-hand-scissors"></i></div>
+                </div>
+                <span class="weapon-name">SCISSOR</span>
+                <span class="key-hint">[S]</span>
+            </div>
+
+            <!-- Royal-5 Tangled Expansion Choices -->
+            <div class="choice expansion-weapon hide" id="pan" title="Rapunzel's Frying Pan: Smashes Scissor & Knocks Crown [Key: F]">
+                <div class="choice-frame">
+                    <div class="fallback-icon" style="display:flex;"><i class="fas fa-utensils"></i></div>
+                </div>
+                <span class="weapon-name">FRYING PAN</span>
+                <span class="key-hint">[F]</span>
+            </div>
+
+            <div class="choice expansion-weapon hide" id="crown" title="Royal Tiara: Outranks Rock & Commands Frying Pan [Key: T]">
+                <div class="choice-frame">
+                    <div class="fallback-icon" style="display:flex;"><i class="fas fa-crown"></i></div>
+                </div>
+                <span class="weapon-name">CROWN</span>
+                <span class="key-hint">[T]</span>
+            </div>
+        </section>
+
+        <!-- Result Banner -->
+        <div class="msg-container">
+            <p id="msg" class="status-neutral">✨ CHOOSE YOUR EMBLEM OR PRESS [R] [P] [S]</p>
+        </div>
+
+        <!-- Scrolling Royal Chronicle Log -->
+        <section class="combat-log-box">
+            <span class="log-header">✨ ROYAL CHRONICLE LOG (RECENT ROUNDS)</span>
+            <ul id="combat-log-list" class="combat-log-list">
+                <li>CHRONICLE_OPEN // Sundrop Markov Matrix initialized at uniform prior.</li>
+            </ul>
+        </section>
+
+        <!-- Bottom Action Buttons -->
+        <div class="controls">
+            <button id="heal-btn" class="btn secondary">
+                <i class="fas fa-sun"></i> Restore Sundrop Light
+            </button>
+            <button id="reset-btn" class="btn danger">
+                <i class="fas fa-rotate"></i> Reset Oracle & Scores
+            </button>
+        </div>
+    </main>
+
+    <script src="sps.js"></script>
 </body>
 </html>
-
-
-
-
-
